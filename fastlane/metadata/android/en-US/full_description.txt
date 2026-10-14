@@ -1,0 +1,15 @@
+<p><i>FuckDPI</i> is an open-source Android app, built for educational purposes, that bypasses DPI-based blocking by running a local desync engine on your device and routing all traffic through it — no remote server, no accounts.</p>
+<p>It uses Android's VpnService to redirect traffic, but the tunnel runs entirely inside your device. It does not encrypt traffic or hide your IP address.</p>
+<p><b>Smart Mode</b><br>One tap is all it takes: on first connect, the app quickly tests curated strategies against real sites and picks the best one automatically.</p>
+<p>
+<b>Features</b><br>
+* Smart Mode — automatic strategy discovery for your network<br>
+* One-tap connect with a clean, simple main screen<br>
+* VPN and Proxy modes (standalone SOCKS5)<br>
+* Per-app filtering (split tunneling)<br>
+* Autostart on device boot<br>
+* In-app updates from GitHub Releases<br>
+* Turkish, English, Russian, Kazakh, Vietnamese<br>
+* Android TV/BOX support + Quick Settings tile<br>
+</p>
+<p><i>Educational and research project. Users are responsible for complying with local laws. Licensed under GNU GPL v3 — see the <a href='https://github.com/winzysss/FuckDPI' target='_blank' rel='nofollow noopener'>project repository</a> for source code and details.</i></p>

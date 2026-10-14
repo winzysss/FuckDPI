@@ -1,0 +1,30 @@
+# OS
+.DS_Store
+
+# IDE
+.idea/
+.kotlin/
+*.iml
+
+# Gradle
+.gradle/
+build/
+
+# Local config
+local.properties
+
+# Android
+/captures
+.externalNativeBuild
+.cxx
+
+# JNI
+app/src/main/jniLibs/
+# Signing
+keystore.properties
+*.jks
+*.keystore
+
+# Agent working files
+work/
+tools/icon_*preview*.png

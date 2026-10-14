@@ -1,0 +1,24 @@
+FuckDPI
+Copyright (C) 2024 winzysss
+
+This program is free software under the GNU General Public License v3.
+See LICENSE for the full text.
+
+This distribution includes third-party open-source components whose
+licenses require preservation of the following notices:
+
+- The DPI-desync engine (app/src/main/cpp/core, git submodule) is
+  distributed under the MIT License:
+  Copyright (c) 2024 hufrea
+
+- The userspace tunnel component (app/src/main/jni/tunnel, git
+  submodule) is distributed under the MIT License:
+  Copyright (c) 2022 hev
+
+  Its bundled dependencies retain their own licenses: hev-task-system
+  (MIT, Copyright (c) 2022 hev), yaml (MIT, Copyright (c) 2022 hev),
+  hev-socks5-core (MIT), lwIP (BSD-3-Clause, Copyright (c) 2001, 2002
+  Swedish Institute of Computer Science), kavl (MIT, Copyright (c)
+  2018 Attractive Chaos).
+
+Full license texts are included in each submodule's source tree.

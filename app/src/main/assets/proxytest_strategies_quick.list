@@ -1,0 +1,12 @@
+-o1 -a1 -r-5+se
+-d1 -s1+s -d3+s -s6+s -a1
+-f-1 -t5 -a1 -At,r,s -d1
+-f-1 -t3 -a1
+-d1 -d3+s -s6+s -d9+s -d12+s -d15+s -r1+s -a1
+-Ku -a2 -An -f-1 -t5 -a1 -At,r,s -d1
+-o1 -r-5+se -a1 -At,r,s -d1 -n {sni} -Qr -f-1 -a1
+-o1 -d1 -a1 -At,r,s -s1 -d1 -s5+s -s10+s -s15+s -s20+s -r1+s -S -a1
+-d1 -s1 -q1 -a1 -Ar -s5 -o1+s -d3+s -s6+s -d9+s -s12+s -d15+s -s20+s -d25+s -s30+s -d35+s -a1
+-f-1 -t8 -n {sni} -Qr -a1 -As -d1 -s1+s -a1
+-d1 -s1+s -d3+s -s6+s -d9+s -s12+s -r1+s -a1
+-Ku -a2 -An -o1 -a1 -r-5+se

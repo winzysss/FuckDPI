@@ -1,0 +1,9 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Questions about the program on Github / Вопросы по програме на Github
+    url: https://github.com/winzysss/FuckDPI/discussions
+    about: Please do not ask questions in the issue tracker / Пожалуйста, не задавайте вопросы в трекере задач
+  - name: Source code and releases / Исходный код и релизы
+    url: https://github.com/winzysss/FuckDPI
+    about: Repository of the project / Репозиторий проекта
+

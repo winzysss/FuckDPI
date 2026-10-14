@@ -1,0 +1,6 @@
+[submodule "tunnel"]
+	path = app/src/main/jni/tunnel
+	url = https://github.com/heiher/hev-socks5-tunnel.git
+[submodule "core"]
+	path = app/src/main/cpp/core
+	url = https://github.com/hufrea/byedpi.git

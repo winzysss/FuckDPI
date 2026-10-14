@@ -1,0 +1,236 @@
+package io.github.winzysss.fuckdpi.fragments
+
+import android.content.Intent
+import android.content.SharedPreferences
+import android.os.Bundle
+import android.util.Log
+import androidx.appcompat.app.AlertDialog
+import androidx.core.content.edit
+import androidx.preference.*
+import io.github.winzysss.fuckdpi.R
+import io.github.winzysss.fuckdpi.BuildConfig
+import io.github.winzysss.fuckdpi.activities.TestActivity
+import io.github.winzysss.fuckdpi.data.Mode
+import io.github.winzysss.fuckdpi.data.PrivateDnsState
+import io.github.winzysss.fuckdpi.utility.*
+import androidx.core.net.toUri
+import androidx.lifecycle.lifecycleScope
+
+class MainSettingsFragment : PreferenceFragmentCompat() {
+    companion object {
+        private val TAG: String = MainSettingsFragment::class.java.simpleName
+    }
+
+    private val preferenceListener =
+        SharedPreferences.OnSharedPreferenceChangeListener { _, _ ->
+            updatePreferences()
+        }
+
+    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
+        setPreferencesFromResource(R.xml.main_settings, rootKey)
+
+        setEditTextPreferenceListener("engine_proxy_ip") { checkIp(it) }
+        setEditTestPreferenceListenerPort("engine_proxy_port")
+        setEditTextPreferenceListener("dns_ip") { it.isBlank() || checkNotLocalIp(it) }
+
+        findPreferenceNotNull<ListPreference>("language")
+            .setOnPreferenceChangeListener { _, newValue ->
+                SettingsUtils.setLang(newValue as String)
+                true
+            }
+
+        findPreferenceNotNull<ListPreference>("app_theme")
+            .setOnPreferenceChangeListener { _, newValue ->
+                SettingsUtils.setTheme(newValue as String)
+                true
+            }
+
+        findPreferenceNotNull<Preference>("proxy_test")
+            .setOnPreferenceClickListener {
+                val intent = Intent(context, TestActivity::class.java)
+                startActivity(intent)
+                true
+            }
+
+        findPreferenceNotNull<Preference>("battery_optimization")
+            .setOnPreferenceClickListener {
+                PermissionUtils.requestBatteryOptimization(requireContext())
+                true
+            }
+
+        findPreferenceNotNull<Preference>("storage_access")
+            .setOnPreferenceClickListener {
+                PermissionUtils.requestStorageAccess(this)
+                true
+            }
+
+        findPreferenceNotNull<Preference>("dns_ip_picker")
+            .setOnPreferenceClickListener {
+                if (PrivateDnsUtils.getState(requireContext()) is PrivateDnsState.Configured) {
+                    updatePreferences()
+                    PrivateDnsUtils.openSettings(requireContext())
+                } else {
+                    showDnsDialog()
+                }
+                true
+            }
+
+        findPreferenceNotNull<Preference>("update_check_now")
+            .setOnPreferenceClickListener {
+                UpdateChecker.checkAndPrompt(
+                    requireActivity(), viewLifecycleOwner.lifecycleScope, manual = true
+                )
+                true
+            }
+
+        findPreferenceNotNull<Preference>("private_dns")
+            .setOnPreferenceClickListener {
+                PrivateDnsUtils.openSettings(requireContext())
+                true
+            }
+
+        findPreferenceNotNull<SwitchPreference>("auto_strategy")
+            .setOnPreferenceChangeListener { _, newValue ->
+                if (newValue == true) {
+                    sharedPreferences?.edit { putBoolean("auto_test_done", false) }
+                }
+                true
+            }
+
+        findPreferenceNotNull<Preference>("version").summary = BuildConfig.VERSION_NAME
+        findPreferenceNotNull<Preference>("engine_version").summary = "0.17.3"
+
+        updatePreferences()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        sharedPreferences?.registerOnSharedPreferenceChangeListener(preferenceListener)
+        updatePreferences()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        sharedPreferences?.unregisterOnSharedPreferenceChangeListener(preferenceListener)
+    }
+
+    private fun updatePreferences() {
+        val cmdEnable = findPreferenceNotNull<SwitchPreference>("engine_enable_cmd_settings").isChecked
+        val mode = findPreferenceNotNull<ListPreference>("engine_mode").value.let { Mode.fromString(it) }
+        val dns = findPreferenceNotNull<Preference>("dns_ip_picker")
+        val dnsEdit = findPreferenceNotNull<EditTextPreference>("dns_ip")
+        val privateDns = findPreferenceNotNull<Preference>("private_dns")
+        val privateDnsState = PrivateDnsUtils.getState(requireContext())
+        val ipv6 = findPreferenceNotNull<SwitchPreference>("ipv6_enable")
+        val proxyIp = findPreferenceNotNull<EditTextPreference>("engine_proxy_ip")
+        val proxyPort = findPreferenceNotNull<EditTextPreference>("engine_proxy_port")
+
+        val applistType = findPreferenceNotNull<ListPreference>("applist_type")
+        val selectedApps = findPreferenceNotNull<Preference>("selected_apps")
+        val batteryOptimization = findPreferenceNotNull<Preference>("battery_optimization")
+        val storageAccess = findPreferenceNotNull<Preference>("storage_access")
+
+        val uiSettings = findPreferenceNotNull<Preference>("engine_ui_settings")
+        val cmdSettings = findPreferenceNotNull<Preference>("engine_cmd_settings")
+        val proxyTest = findPreferenceNotNull<Preference>("proxy_test")
+
+        val (cmdIp, cmdPort) = if (cmdEnable) {
+            sharedPreferences?.checkIpAndPortInCmd() ?: Pair(null, null)
+        } else {
+            Pair(null, null)
+        }
+        proxyIp.isVisible = cmdIp == null
+        proxyPort.isVisible = cmdPort == null
+
+        uiSettings.isEnabled = !cmdEnable
+        cmdSettings.isEnabled = cmdEnable
+        proxyTest.isEnabled = cmdEnable
+
+        dns.summary = dnsSummary()
+        dnsEdit.isVisible = false
+        privateDns.summary = (privateDnsState as? PrivateDnsState.Configured)?.hostname
+        privateDns.isVisible = mode == Mode.VPN && privateDnsState is PrivateDnsState.Configured
+
+        when (mode) {
+            Mode.VPN -> {
+                dns.isVisible = privateDnsState !is PrivateDnsState.Configured
+                ipv6.isVisible = true
+
+                when (applistType.value) {
+                    "disable" -> {
+                        applistType.isVisible = true
+                        selectedApps.isVisible = false
+                    }
+                    "blacklist", "whitelist" -> {
+                        applistType.isVisible = true
+                        selectedApps.isVisible = true
+                    }
+                    else -> {
+                        applistType.isVisible = true
+                        selectedApps.isVisible = false
+                        Log.w(TAG, "Unexpected applistType value: ${applistType.value}")
+                    }
+                }
+            }
+
+            Mode.Proxy -> {
+                dns.isVisible = false
+                ipv6.isVisible = false
+                applistType.isVisible = false
+                selectedApps.isVisible = false
+            }
+        }
+
+        if (PermissionUtils.isBatteryOptimizationDisabled(requireContext())) {
+            batteryOptimization.summary = getString(R.string.battery_optimization_disabled_summary)
+        } else {
+            batteryOptimization.summary = getString(R.string.battery_optimization_summary)
+        }
+
+        if (PermissionUtils.hasStorageAccess(requireContext())) {
+            storageAccess.summary = getString(R.string.storage_access_allowed_summary)
+        } else {
+            storageAccess.summary = getString(R.string.storage_access_summary)
+        }
+    }
+
+    private val dnsPresets: List<Pair<String, String>>
+        get() = listOf(
+            "" to getString(R.string.dns_system),
+            "8.8.8.8" to getString(R.string.dns_google),
+            "1.1.1.1" to getString(R.string.dns_cloudflare),
+            "9.9.9.9" to getString(R.string.dns_quad9),
+            "77.88.8.8" to getString(R.string.dns_yandex),
+        )
+
+    private fun dnsSummary(): String {
+        val ip = sharedPreferences?.getStringNotNull("dns_ip", "1.1.1.1") ?: "1.1.1.1"
+        val preset = dnsPresets.firstOrNull { it.first == ip } ?: return ip
+        return if (preset.first.isBlank()) preset.second else "${preset.second} ($ip)"
+    }
+
+    private fun showDnsDialog() {
+        val context = requireContext()
+        val presets = dnsPresets
+
+        val items = (presets.map { it.second } + getString(R.string.dns_custom)).toTypedArray()
+        val dnsPref = findPreferenceNotNull<EditTextPreference>("dns_ip")
+
+        AlertDialog.Builder(context)
+            .setTitle(getString(R.string.dbs_ip_setting))
+            .setItems(items) { _, which ->
+                if (which < presets.size) {
+                    sharedPreferences?.edit { putString("dns_ip", presets[which].first) }
+                } else {
+                    onDisplayPreferenceDialog(dnsPref)
+                }
+            }
+            .setNegativeButton(android.R.string.cancel, null)
+            .show()
+    }
+
+    private fun openUrl(url: String) {
+        val intent = Intent(Intent.ACTION_VIEW, url.toUri())
+        startActivity(intent)
+    }
+}

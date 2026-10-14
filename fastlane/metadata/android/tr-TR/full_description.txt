@@ -1,0 +1,15 @@
+<p><i>FuckDPI</i>, eğitim amaçlı geliştirilmiş açık kaynak bir Android uygulamasıdır. DPI tabanlı engellemeleri aşmak için cihazınızda yerel bir desenkronizasyon motoru çalıştırır ve tüm trafiği onun üzerinden geçirir — uzak sunucu yok, hesap yok.</p>
+<p>Trafik yönlendirmesi için Android'in VpnService'ini kullanır ama tünel tamamen cihazınızın içinde çalışır. Trafiği şifrelemez ve IP adresinizi gizlemez.</p>
+<p><b>Akıllı Mod</b><br>Tek tuş yeterli: ilk bağlanışta uygulama, seçilmiş stratejileri gerçek sitelere karşı hızlıca dener ve en iyisini otomatik seçer.</p>
+<p>
+<b>Özellikler</b><br>
+* Akıllı Mod — ağınızda çalışan stratejiyi kendisi bulur<br>
+* Tek tuşla bağlanma, sade ana ekran<br>
+* VPN ve Proxy modları (bağımsız SOCKS5)<br>
+* Uygulama bazında filtreleme (bölünmüş tünel)<br>
+* Cihaz açılışında otomatik başlatma<br>
+* GitHub Releases üzerinden uygulama içi güncelleme<br>
+* Türkçe, İngilizce, Rusça, Kazakça, Vietnamca<br>
+* Android TV/BOX desteği + Hızlı Ayarlar kutucuğu<br>
+</p>
+<p><i>Eğitim ve araştırma projesidir. Kullanıcılar yerel yasalara uymaktan sorumludur. GNU GPL v3 lisansı — kaynak kodu ve ayrıntılar için <a href='https://github.com/winzysss/FuckDPI' target='_blank' rel='nofollow noopener'>proje deposuna</a> bakın.</i></p>
